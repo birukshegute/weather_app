@@ -53,7 +53,7 @@ def next_three_days_weather(lat, lon, API_key):
 
     result = []
     for i, (date, temps) in enumerate(daily_forecast.items()):
-        if i > 0 and i < 4:
+        if i < 4:
             result.append({
                 'date': date,
                 'high_temp': temps['high_temp'],
@@ -66,7 +66,7 @@ def main(city_name, country_name):
     lat, lon = get_loc(city_name, country_name, api_key)
     current_data = current_weather(lat, lon, api_key)
     today_data = next_three_days_weather(lat, lon, api_key)[0]
-    next_three_days = next_three_days_weather(lat, lon, api_key)
+    next_three_days = next_three_days_weather(lat, lon, api_key) [1:4]
     return {
         "current_weather": current_data,
         "today_forecast": today_data,
