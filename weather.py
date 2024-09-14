@@ -72,6 +72,3 @@ def main(city_name, country_name):
         "today_forecast": today_data,
         "next_three_days": next_three_days
     }
-
-if __name__ == "__main__":
-    pass

@@ -7,10 +7,39 @@
 </head>
 <body>
     <h1>Weather App</h1>
-    <form action = "/" method = "post">
-        <input type = "text" id = "cityName" name = "cityName" placeholder = "Enter a city">
-        <input type = "text" id = "countryName" name = "countryName" placeholder = "Enter a country"> <br>
-        <button> Show Weather </button>
+    <form action="/" method="POST">
+        <input type="text" id="cityName" name="cityName" placeholder="Enter a city">
+        <input type="text" id="countryName" name="countryName" placeholder="Enter a country"> <br>
+        <button>Show Weather</button>
     </form>
+
+    {% if data %}
+    <h2>Current Weather in {{ request.form.cityName }}, {{ request.form.countryName }}</h2>
+
+    <!-- Display today's weather -->
+    <div>
+        <h3>Today's Weather</h3>
+        <p>Main: {{ data.current_weather.main }}</p>
+        <p>Description: {{ data.current_weather.description }}</p>
+        <img src="http://openweathermap.org/img/wn/{{ data.current_weather.icon }}@2x.png" alt="weather icon">
+        <p>Current Temperature: {{ data.current_weather.current | int }}°C</p>
+        <p>Today's High: {{ data.today_forecast.high_temp | int }}°C</p>
+        <p>Today's Low: {{ data.today_forecast.low_temp | int }}°C</p>
+    </div>
+
+    <!-- Display next 3 days' weather -->
+    <div>
+        <h3>Next 3 Days' Forecast</h3>
+        <ul>
+            {% for day in data.next_three_days %}
+            <li>
+                <p>Date: {{ day.date }}</p>
+                <p>High: {{ day.high_temp | int }}°C</p>
+                <p>Low: {{ day.low_temp | int }}°C</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 </body>
 </html>
