@@ -2,7 +2,6 @@ import requests
 from dotenv import load_dotenv
 import os
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 
 load_dotenv()
 api_key = os.getenv('API_KEY')
@@ -14,11 +13,9 @@ class WeatherData:
     description: str
     icon: str
     current: float
-    max: float
-    min: float
 
 def get_loc(city_name, country_code, API_key):
-    """Get the location of the city using geeocoding api"""
+    """Get the location of the city using geocoding API"""
     response = requests.get(f'http://api.openweathermap.org/geo/1.0/direct?q={city_name},{country_code}&appid={API_key}').json()
     data = response[0]
     lat, lon = data.get('lat'), data.get('lon')
@@ -26,68 +23,54 @@ def get_loc(city_name, country_code, API_key):
     return lat, lon
 
 def current_weather(lat, lon, API_key):
-    """fetch the weather data for today"""
+    """Fetch the current weather data"""
     response = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API_key}&units=metric').json()
     data = WeatherData(
         main = response.get('weather')[0].get('main'),
         description = response.get('weather')[0].get('description'),
         icon = response.get('weather')[0].get('icon'),
-        current = response.get('main').get('temp'),
-        max = response.get('main').get('temp_max'),
-        min = response.get('main').get('temp_min'),
+        current = response.get('main').get('temp')
     )
     return data
 
 def next_three_days_weather(lat, lon, API_key):
-    """Fetch the weather for the next 3 days"""
+    """Fetch the weather for the next 3 days (including today)"""
     response = requests.get(f'https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API_key}&units=metric').json()
     forecast = response.get('list', [])
     
-    daily_forecast = []
+    daily_forecast = {}
 
-    for i in range(0, 24, 8):
-        day = forecast[i]
-        daily_forecast.append({
-            'date': day.get('dt_txt'),
-            'high_temp': day.get('main').get('temp_max'),
-            'low_temp': day.get('main').get('temp_min'),
-            'description': day.get('weather')[0].get('description')
-        })
-    
-    return daily_forecast
+    for entry in forecast:
+        date = entry['dt_txt'].split(' ')[0]
+        temp_max = entry['main'].get('temp_max')
+        temp_min = entry['main'].get('temp_min')
 
-def last_three_days_weather(lat, lon, API_key):
-    """Fetch the weather for the last 3 days."""
-    end_time = int(datetime.now().timestamp())
-    start_time = int((datetime.now() - timedelta(days=3)).timestamp())
-    
-    url = f'https://history.openweathermap.org/data/2.5/history/city?lat={lat}&lon={lon}&type=hour&start={start_time}&end={end_time}&appid={API_key}&units=metric'
-    
-    response = requests.get(url).json()
-    history_data = response.get('list', [])
-    
-    daily_history = []
-    
-    for i in range(0, len(history_data), 8):
-        day = history_data[i]
-        daily_history.append({
-            'date': datetime.utcfromtimestamp(day.get('dt')).strftime('%Y-%m-%d'),
-            'high_temp': day.get('main').get('temp_max'),
-            'low_temp': day.get('main').get('temp_min'),
-            'description': day.get('weather')[0].get('description'),
-        })
-    
-    return daily_history
+        if date not in daily_forecast:
+            daily_forecast[date] = {'high_temp': temp_max, 'low_temp': temp_min}
+        else:
+            daily_forecast[date]['high_temp'] = max(daily_forecast[date]['high_temp'], temp_max)
+            daily_forecast[date]['low_temp'] = min(daily_forecast[date]['low_temp'], temp_min)
+
+    result = []
+    for i, (date, temps) in enumerate(daily_forecast.items()):
+        if i > 0 and i < 4:
+            result.append({
+                'date': date,
+                'high_temp': temps['high_temp'],
+                'low_temp': temps['low_temp'],
+            })
+
+    return result
 
 def main(city_name, country_name):
-    lat, lon = get_loc('Addis Ababa', 'Ethiopia', api_key)
+    lat, lon = get_loc(city_name, country_name, api_key)
     current_data = current_weather(lat, lon, api_key)
+    today_data = next_three_days_weather(lat, lon, api_key)[0]
     next_three_days = next_three_days_weather(lat, lon, api_key)
-    last_three_days = last_three_days_weather(lat, lon, api_key)
     return {
         "current_weather": current_data,
-        "next_three_days": next_three_days,
-        "last_three_days": last_three_days
+        "today_forecast": today_data,
+        "next_three_days": next_three_days
     }
 
 if __name__ == "__main__":
