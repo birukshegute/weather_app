@@ -20,9 +20,11 @@
         <button type="submit">Show Weather</button>
     </form>
 
+    {% if request.form.cityName and request.form.countryName %}
     <div class="loc-container">
     <p>{{ request.form.cityName }}, {{ request.form.countryName }}</p>
     </div>
+    {% endif %}
 
     {% if error_message %}
     <div class="text-white-500 text-5xl mb-6">{{ error_message }}</div>
@@ -51,8 +53,15 @@
         {% endfor %}
     </div>
     {% endif %}
-    <footer class="text-center mt-10 p-4 text-gray-800">
-        <p class="text-xl font-semibold" class="text-white-300" >Powered by: 
+    <footer class="text-center mt-10 p-4">
+        <p class="text-xl font-semibold">
+             <a href="{{ url_for('about') }}"
+                class= "text-white hover:text-blue-800 font-bold transition duration-300 ease-in-out"
+               target="_blank">
+                About Weather App    
+             </a> 
+        </p> <br>
+        <p class="text-xl font-semibold" class="text-white" > Powered by: 
             <a href="https://openweathermap.org" 
                class="text-blue-600 hover:text-blue-800 font-bold transition duration-300 ease-in-out"
                target="_blank">
