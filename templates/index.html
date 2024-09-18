@@ -3,43 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='output.css') }}">
     <title>Weather App</title>
+    <style>
+        body {
+            background-image: url('{{ url_for('static', filename='images/background.jpg') }}');
+        }
+    </style>
 </head>
 <body>
     <h1>Weather App</h1>
+
     <form action="/" method="POST">
-        <input type="text" id="cityName" name="cityName" placeholder="Enter a city">
-        <input type="text" id="countryName" name="countryName" placeholder="Enter a country"> <br>
-        <button>Show Weather</button>
+        <input type="text" name="cityName" placeholder="Enter a city" required>
+        <input type="text" name="countryName" placeholder="Enter a country" required>
+        <button type="submit">Show Weather</button>
     </form>
 
-    {% if data %}
-    <h2>Current Weather in {{ request.form.cityName }}, {{ request.form.countryName }}</h2>
-
-    <!-- Display today's weather -->
-    <div>
-        <h3>Today's Weather</h3>
-        <p>Main: {{ data.current_weather.main }}</p>
-        <p>Description: {{ data.current_weather.description }}</p>
-        <img src="http://openweathermap.org/img/wn/{{ data.current_weather.icon }}@2x.png" alt="weather icon">
-        <p>Current Temperature: {{ data.current_weather.current | int }}°C</p>
-        <p>Today's High: {{ data.today_forecast.high_temp | int }}°C</p>
-        <p>Today's Low: {{ data.today_forecast.low_temp | int }}°C</p>
+    <div class="loc-container">
+    <p>{{ request.form.cityName }}, {{ request.form.countryName }}</p>
     </div>
 
-    <!-- Display next 3 days' weather -->
-    <div>
-        <h3>Next 3 Days' Forecast</h3>
-        <ul>
-            {% for day in data.next_three_days %}
-            <li>
-                <p>Date: {{ day.date }}</p>
-                <p>High: {{ day.high_temp | int }}°C</p>
-                <p>Low: {{ day.low_temp | int }}°C</p>
-            </li>
-            {% endfor %}
-        </ul>
+    {% if error_message %}
+    <div class="text-white-500 text-5xl mb-6">{{ error_message }}</div>
+    {% endif %}
+
+    {% if data %}
+    <div class="weather-container">
+        <div class="icon-weather">
+            <img src="https://openweathermap.org/img/wn/{{ data.current_weather.icon }}@4x.png" alt="Weather icon">
+            <p>{{ data.current_weather.current }}°C</p>
+            <p>{{ data.current_weather.main }}</p>
+        </div>
+
+        <!-- Display high and low temperatures -->
+        <p class="mt-4">Max: {{ data.today_forecast.high_temp }}°C | Min: {{ data.today_forecast.low_temp }}°C</p>
+    </div>
+
+    <!-- Display the next three days' forecast -->
+    <div class="forecast-container">
+        {% for day in data.next_three_days %}
+        <div class="forecast-card">
+            <p>{{ day.date }}</p>
+            <p>{{ day.high_temp }}°C</p>
+            <p>{{ day.low_temp }}°C</p>
+        </div>
+        {% endfor %}
     </div>
     {% endif %}
+    <footer class="text-center mt-10 p-4 text-gray-800">
+        <p class="text-xl font-semibold" class="text-white-300" >Powered by: 
+            <a href="https://openweathermap.org" 
+               class="text-blue-600 hover:text-blue-800 font-bold transition duration-300 ease-in-out"
+               target="_blank">
+                OpenWeather
+            </a>
+        </p>
+    </footer>
 </body>
+
 </html>
