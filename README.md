@@ -43,7 +43,7 @@ The app is designed to work on both mobile and desktop devices. The layout adjus
 ## Credits
 Weather Data: This app uses the OpenWeather API to retrieve weather data. <br>
 Background Image: The background image was sourced from Pixabay.com, a repository of high-quality, free-to-use images. <br>
-Music: The background music used in the video demo is produced by StockTune.
+Music: The background music used in the video demo is produced by StockTune. <br>
 Project Developer: This app was built by Biruk Shegute as part of the ALX Software Engineering program, specifically for the Backend Specialization Webstack Portfolio project.
 
 ## Video Demonstration
