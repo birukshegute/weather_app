@@ -20,7 +20,6 @@ Jinja2 Templating: Flask’s templating engine, used to dynamically display weat
 Pixabay: Free background images were sourced from Pixabay.com, ensuring an aesthetic and professional design. <br>
 OpenWeather API: Provides the weather data, including current conditions and a 3-day forecast for any city in the world.
 
-## How to Use the App
 
 ### Search for a City:
 
